@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# Hioso NMS OLT
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Desktop Electron application for monitoring and managing OLT devices with a React frontend.
 
-## Available Scripts
+## Requirements
 
-In the project directory, you can run:
+- Node.js
+- npm
 
-### `npm start`
+## Install
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+From the project directory:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+npm install
+```
 
-### `npm test`
+## Run in development
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Windows
 
-### `npm run build`
+Use the included batch file from the project root:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bat
+start-project.bat
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+This script:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- installs dependencies when `node_modules` is missing
+- starts the React development server without opening the browser
+- waits for `http://localhost:3000`
+- starts Electron in development mode
 
-### `npm run eject`
+### Manual command
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+If your shell supports the npm script environment syntax, you can also run:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm run electron:dev
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Build
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm run build
+```
 
-## Learn More
+## Electron packaging
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm run electron:build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Platform-specific builds:
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+npm run electron:build:win
+npm run electron:build:mac
+npm run electron:build:linux
+```

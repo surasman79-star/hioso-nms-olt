@@ -4,26 +4,26 @@ setlocal
 cd /d "%~dp0"
 
 if not exist package.json (
-  echo package.json tidak ditemukan.
-  echo Pastikan file ini berada di folder project hioso-nms-olt.
+  echo package.json was not found.
+  echo Make sure this file is inside the hioso-nms-olt project folder.
   pause
   exit /b 1
 )
 
 if not exist node_modules (
-  echo node_modules belum ada. Menjalankan npm install...
+  echo node_modules was not found. Running npm install...
   call npm install
   if errorlevel 1 goto :error
 )
 
-echo Menjalankan React dev server...
+echo Starting the React dev server...
 start "Hioso NMS React" cmd /k "cd /d \"%~dp0\" && set BROWSER=none && npm start"
 
-echo Menunggu http://localhost:3000 siap...
+echo Waiting for http://localhost:3000...
 call npx wait-on http://localhost:3000
 if errorlevel 1 goto :error
 
-echo Menjalankan Electron...
+echo Starting Electron...
 set NODE_ENV=development
 call npx electron .
 if errorlevel 1 goto :error
@@ -31,6 +31,6 @@ if errorlevel 1 goto :error
 exit /b 0
 
 :error
-echo Gagal menjalankan project.
+echo Failed to start the project.
 pause
 exit /b 1
