@@ -1,4 +1,4 @@
-const snmp = require('snmp');
+const snmp = require('net-snmp');
 const logger = require('../utils/logger');
 
 class SNMPClient {
@@ -30,22 +30,22 @@ class SNMPClient {
       const session = snmp.createSession(this.host, this.community, { port: this.port, timeout: this.timeout });
       const results = [];
 
-      const maxRepetitions = 20;
-      session.getBulk([0], [maxRepetitions], oid, (error, varbinds) => {
+      session.subtree(oid, 20, (varbinds) => {
+        varbinds.forEach(varbind => {
+          if (snmp.isVarbindError(varbind)) {
+            logger.warn('SNMP Varbind error:', snmp.varbindError(varbind));
+          } else {
+            results.push({ oid: varbind.oid, value: varbind.value });
+          }
+        });
+      }, (error) => {
+        session.close();
         if (error) {
           logger.error(`SNMP WALK error for ${oid}:`, error);
           reject(error);
         } else {
-          varbinds.forEach(varbind => {
-            if (snmp.isVarbindError(varbind)) {
-              logger.warn('SNMP Varbind error:', snmp.varbindError(varbind));
-            } else {
-              results.push({ oid: varbind.oid, value: varbind.value });
-            }
-          });
           resolve(results);
         }
-        session.close();
       });
     });
   }
