@@ -1,0 +1,145 @@
+.page-content {
+  padding: 24px 32px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #e6edf3;
+  margin: 0;
+}
+
+.page-meta {
+  color: #7d8590;
+  font-size: 0.9rem;
+}
+
+.olt-info-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.olt-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.olt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.olt-field-label {
+  font-size: 0.75rem;
+  color: #7d8590;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.olt-field-value {
+  color: #e6edf3;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stat-label {
+  color: #7d8590;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.stat-sub {
+  color: #7d8590;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e6edf3;
+  margin: 0 0 16px 0;
+}
+
+.pon-overview {
+  margin-bottom: 24px;
+}
+
+.pon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.pon-box {
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid;
+}
+
+.pon-up {
+  background: rgba(63, 185, 80, 0.08);
+  border-color: rgba(63, 185, 80, 0.3);
+}
+
+.pon-down {
+  background: rgba(248, 81, 73, 0.08);
+  border-color: rgba(248, 81, 73, 0.3);
+}
+
+.pon-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e6edf3;
+  margin-bottom: 6px;
+}
+
+.pon-count {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #58a6ff;
+  margin-bottom: 4px;
+}
+
+.pon-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pon-up .pon-status { color: #3fb950; }
+.pon-down .pon-status { color: #f85149; }
