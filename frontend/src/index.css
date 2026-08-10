@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.card {
+  @apply bg-slate-900 rounded-lg border border-slate-700 p-6;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.badge-success {
+  @apply bg-green-900 text-green-200;
+}
+
+.badge-warning {
+  @apply bg-yellow-900 text-yellow-200;
+}
