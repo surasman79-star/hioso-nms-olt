@@ -20,7 +20,7 @@ echo Starting the React dev server...
 start "Hioso NMS React" cmd /k "cd /d \"%~dp0\" && set BROWSER=none && npm start"
 
 echo Waiting for http://localhost:3000...
-call npx wait-on http://localhost:3000
+call npx wait-on http://localhost:3000 --timeout 60000
 if errorlevel 1 goto :error
 
 echo Starting Electron...
@@ -32,5 +32,6 @@ exit /b 0
 
 :error
 echo Failed to start the project.
+echo Check the "Hioso NMS React" window for React startup errors.
 pause
 exit /b 1
