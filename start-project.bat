@@ -16,6 +16,14 @@ if not exist node_modules (
   if errorlevel 1 goto :error
 )
 
+netstat -ano | findstr /r /c:":3000 .*LISTENING" >nul
+if not errorlevel 1 (
+  echo Port 3000 is already in use.
+  echo Stop the existing process on port 3000 and try again.
+  pause
+  exit /b 1
+)
+
 echo Starting the React dev server...
 start "Hioso NMS React" cmd /k "cd /d \"%~dp0\" && set BROWSER=none && npm start"
 
