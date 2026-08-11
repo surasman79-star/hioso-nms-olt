@@ -27,6 +27,7 @@ const OID = {
   ifInOctets:  '1.3.6.1.2.1.2.2.1.10',      // table
   ifOutOctets: '1.3.6.1.2.1.2.2.1.16',      // table
 };
+const interfaceCounterCache = new Map();
 
 // ---------------------------------------------------------------------------
 // SNMP helpers
@@ -185,8 +186,25 @@ async function getGePortsSNMP(ifaces) {
     /ge|gige|ethernet|eth/i.test(i.name) && !/gpon|pon/i.test(i.name)
   );
   return geIfaces.map((i, idx) => {
-    const mbpsIn  = i.speed > 0 ? ((i.inOctets  * 8) / i.speed * 100).toFixed(1) : '0';
-    const mbpsOut = i.speed > 0 ? ((i.outOctets * 8) / i.speed * 100).toFixed(1) : '0';
+    const now = Date.now();
+    const currentIn = Number(i.inOctets) || 0;
+    const currentOut = Number(i.outOctets) || 0;
+    const prev = interfaceCounterCache.get(i.idx);
+    let inBps = 0;
+    let outBps = 0;
+    if (prev) {
+      const deltaSec = Math.max((now - prev.ts) / 1000, 1);
+      const wrap32 = 0x100000000;
+      const deltaIn = currentIn >= prev.inOctets
+        ? currentIn - prev.inOctets
+        : (wrap32 - prev.inOctets) + currentIn;
+      const deltaOut = currentOut >= prev.outOctets
+        ? currentOut - prev.outOctets
+        : (wrap32 - prev.outOctets) + currentOut;
+      inBps = (deltaIn * 8) / deltaSec;
+      outBps = (deltaOut * 8) / deltaSec;
+    }
+    interfaceCounterCache.set(i.idx, { inOctets: currentIn, outOctets: currentOut, ts: now });
     const speedStr = i.speed >= 1e9 ? '1000M' : i.speed >= 100e6 ? '100M' : i.speed > 0 ? `${i.speed / 1e6}M` : '---';
     return {
       id:         idx + 1,
@@ -194,8 +212,8 @@ async function getGePortsSNMP(ifaces) {
       status:     i.status,
       speed:      speedStr,
       duplex:     'Full',
-      inTraffic:  formatBps(i.inOctets),
-      outTraffic: formatBps(i.outOctets),
+      inTraffic:  formatBps(inBps),
+      outTraffic: formatBps(outBps),
       role:       idx === 0 ? 'Uplink' : 'Management',
     };
   });
@@ -276,7 +294,9 @@ async function getPonPorts() {
     if (config.USE_SSH) return mockData.ponPorts; // SSH pon ports not yet implemented
     const ifaces = await getIfTableSNMP();
     const ports = await getPonPortsSNMP(ifaces);
-    return ports.length ? ports : mockData.ponPorts;
+    if (ports.length) return ports;
+    if (config.MOCK_FALLBACK) return mockData.ponPorts;
+    throw new Error('No PON interface detected from SNMP ifDescr.');
   });
 }
 
@@ -285,7 +305,9 @@ async function getGePorts() {
     if (config.USE_SSH) return mockData.gePorts;
     const ifaces = await getIfTableSNMP();
     const ports = await getGePortsSNMP(ifaces);
-    return ports.length ? ports : mockData.gePorts;
+    if (ports.length) return ports;
+    if (config.MOCK_FALLBACK) return mockData.gePorts;
+    throw new Error('No GE interface detected from SNMP ifDescr.');
   });
 }
 

@@ -85,7 +85,7 @@ app.get('/api/health', (req, res) => {
 const PORT = config.API_PORT;
 app.listen(PORT, () => {
   console.log(`[server] API running on http://localhost:${PORT}`);
-  console.log(`[server] OLT IP: ${config.OLT_IP}  SNMP community: ${config.SNMP_COMMUNITY}`);
+  console.log(`[server] OLT IP: ${config.OLT_IP}  SNMP community: ***`);
   console.log(`[server] Mode: ${config.USE_SSH ? 'SSH' : 'SNMP'}`);
   console.log(`[server] Mock fallback: ${config.MOCK_FALLBACK ? 'enabled' : 'disabled'}`);
 });

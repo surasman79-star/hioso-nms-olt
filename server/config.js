@@ -3,7 +3,7 @@ require('dotenv').config();
 function parseSnmpVersion(rawValue) {
   const value = String(rawValue ?? '').trim().toLowerCase();
   if (value === '0' || value === '1' || value === 'v1') return 0;
-  if (value === '1c' || value === '2' || value === '2c' || value === 'v2' || value === 'v2c') return 1;
+  if (value === '2' || value === '2c' || value === 'v2' || value === 'v2c') return 1;
   if (value === '3' || value === 'v3') return 3;
   return 1;
 }
