@@ -253,68 +253,103 @@ async function getOnusSSH() {
 // Public API
 // ---------------------------------------------------------------------------
 
-async function getOltInfo() {
+async function withFallback(label, fallbackData, fn) {
   try {
-    return config.USE_SSH ? await getOltInfoSSH() : await getOltInfoSNMP();
+    return await fn();
   } catch (err) {
-    console.warn('[OLT] getOltInfo failed, using mock data:', err.message);
-    return mockData.oltInfo;
+    if (config.MOCK_FALLBACK) {
+      console.warn(`[OLT] ${label} failed, using mock data:`, err.message);
+      return fallbackData;
+    }
+    throw new Error(`${label} failed: ${err.message}`);
   }
 }
 
+async function getOltInfo() {
+  return withFallback('getOltInfo', mockData.oltInfo, async () => {
+    return config.USE_SSH ? await getOltInfoSSH() : await getOltInfoSNMP();
+  });
+}
+
 async function getPonPorts() {
-  try {
+  return withFallback('getPonPorts', mockData.ponPorts, async () => {
     if (config.USE_SSH) return mockData.ponPorts; // SSH pon ports not yet implemented
     const ifaces = await getIfTableSNMP();
     const ports = await getPonPortsSNMP(ifaces);
     return ports.length ? ports : mockData.ponPorts;
-  } catch (err) {
-    console.warn('[OLT] getPonPorts failed, using mock data:', err.message);
-    return mockData.ponPorts;
-  }
+  });
 }
 
 async function getGePorts() {
-  try {
+  return withFallback('getGePorts', mockData.gePorts, async () => {
     if (config.USE_SSH) return mockData.gePorts;
     const ifaces = await getIfTableSNMP();
     const ports = await getGePortsSNMP(ifaces);
     return ports.length ? ports : mockData.gePorts;
-  } catch (err) {
-    console.warn('[OLT] getGePorts failed, using mock data:', err.message);
-    return mockData.gePorts;
-  }
+  });
 }
 
 async function getOnus() {
-  try {
+  return withFallback('getOnus', mockData.onus, async () => {
     if (config.USE_SSH) return await getOnusSSH();
     // SNMP ONU list needs vendor-specific OIDs; fall back to mock
     return mockData.onus;
-  } catch (err) {
-    console.warn('[OLT] getOnus failed, using mock data:', err.message);
-    return mockData.onus;
-  }
+  });
 }
 
 async function getOnuTraffic() {
-  try {
+  return withFallback('getOnuTraffic', mockData.onuTraffic, async () => {
     // Traffic counters require vendor-specific SNMP OIDs or SSH
     // Returning mock data until vendor OIDs are configured
     return mockData.onuTraffic;
-  } catch (err) {
-    console.warn('[OLT] getOnuTraffic failed, using mock data:', err.message);
-    return mockData.onuTraffic;
-  }
+  });
 }
 
 async function getOnuConfigs() {
-  try {
+  return withFallback('getOnuConfigs', mockData.onuConfigs, async () => {
     return mockData.onuConfigs;
-  } catch (err) {
-    console.warn('[OLT] getOnuConfigs failed, using mock data:', err.message);
-    return mockData.onuConfigs;
+  });
+}
+
+async function getDiagnostics() {
+  const diagnostics = {
+    mode: config.USE_SSH ? 'SSH' : 'SNMP',
+    oltIp: config.OLT_IP,
+    mockFallbackEnabled: config.MOCK_FALLBACK,
+    checks: [],
+  };
+
+  if (config.USE_SSH) {
+    try {
+      await sshExec('display version');
+      diagnostics.checks.push({ name: 'ssh', ok: true });
+    } catch (err) {
+      diagnostics.checks.push({ name: 'ssh', ok: false, error: err.message });
+    }
+    return diagnostics;
   }
+
+  const checks = [
+    { name: 'sysName', oid: OID.sysName },
+    { name: 'sysDescr', oid: OID.sysDescr },
+    { name: 'ifDescr', oid: OID.ifDescr, subtree: true },
+  ];
+
+  for (const check of checks) {
+    try {
+      if (check.subtree) {
+        const rows = await snmpSubtree(check.oid);
+        diagnostics.checks.push({ name: check.name, ok: rows.length > 0, count: rows.length });
+      } else {
+        const vbs = await snmpGet([check.oid]);
+        diagnostics.checks.push({ name: check.name, ok: true, value: vbValue(vbs[0]) });
+      }
+    } catch (err) {
+      diagnostics.checks.push({ name: check.name, ok: false, error: err.message });
+    }
+  }
+
+  return diagnostics;
 }
 
 module.exports = {
@@ -324,4 +359,5 @@ module.exports = {
   getOnus,
   getOnuTraffic,
   getOnuConfigs,
+  getDiagnostics,
 };

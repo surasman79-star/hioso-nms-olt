@@ -66,6 +66,14 @@ app.get('/api/olt/onu-configs', async (req, res) => {
   }
 });
 
+app.get('/api/olt/diagnostics', async (req, res) => {
+  try {
+    res.json(await olt.getDiagnostics());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', oltIp: config.OLT_IP, time: new Date().toISOString() });
@@ -79,4 +87,5 @@ app.listen(PORT, () => {
   console.log(`[server] API running on http://localhost:${PORT}`);
   console.log(`[server] OLT IP: ${config.OLT_IP}  SNMP community: ${config.SNMP_COMMUNITY}`);
   console.log(`[server] Mode: ${config.USE_SSH ? 'SSH' : 'SNMP'}`);
+  console.log(`[server] Mock fallback: ${config.MOCK_FALLBACK ? 'enabled' : 'disabled'}`);
 });

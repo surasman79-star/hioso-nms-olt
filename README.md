@@ -46,6 +46,17 @@ npm run electron:dev
 npm run build
 ```
 
+## Troubleshooting OLT masih mock
+
+1. Pastikan `.env` memakai IP OLT yang valid (contoh `170.0.232.89`).
+2. Untuk SNMP v2c, set `SNMP_VERSION=1` (nilai `2` juga akan dipetakan ke v2c).
+3. Set `MOCK_FALLBACK=false` agar backend mengembalikan error asli.
+4. Cek diagnosis backend:
+
+```bash
+http://localhost:5000/api/olt/diagnostics
+```
+
 ## Electron packaging
 
 ```bash
