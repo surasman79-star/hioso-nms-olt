@@ -1,5 +1,6 @@
-import React from "react";
-import { onuTraffic } from "../data/mockData";
+import React, { useCallback } from "react";
+import { getOnuTraffic } from "../services/api";
+import { useOltData } from "../services/useOltData";
 import "./TablePage.css";
 
 function TrafficBar({ value, max = 100, color }) {
@@ -17,11 +18,23 @@ function TrafficBar({ value, max = 100, color }) {
 }
 
 function OnuTraffic() {
+  const fetchFn = useCallback(getOnuTraffic, []);
+  const { data: onuTraffic, loading, error } = useOltData(fetchFn);
+
+  if (loading && !onuTraffic) {
+    return <div className="page-content"><div className="loading-state">Loading ONU traffic…</div></div>;
+  }
+
+  const traffic = onuTraffic || [];
+
   return (
     <div className="page-content">
       <div className="page-header">
         <h1 className="page-title">ONU Traffic</h1>
-        <span className="page-meta">{onuTraffic.length} active ONUs</span>
+        <span className="page-meta">
+          {traffic.length} active ONUs
+          {error && <span className="error-inline"> · ⚠ {error}</span>}
+        </span>
       </div>
       <div className="table-card">
         <table className="data-table">
@@ -39,7 +52,7 @@ function OnuTraffic() {
             </tr>
           </thead>
           <tbody>
-            {onuTraffic.map((t) => (
+            {traffic.map((t) => (
               <tr key={t.id}>
                 <td className="port-name">{t.id}</td>
                 <td>{t.ponPort}</td>

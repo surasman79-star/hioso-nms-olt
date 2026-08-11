@@ -5,6 +5,29 @@
   overflow: auto;
 }
 
+.loading-state,
+.error-state,
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+  color: #7d8590;
+  font-size: 0.95rem;
+}
+
+.error-state {
+  color: #f85149;
+}
+
+.error-inline {
+  color: #f85149;
+  font-size: 0.8rem;
+}
+
+.last-updated {
+  font-size: 0.78rem;
+  color: #7d8590;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { onus } from "../data/mockData";
+import React, { useState, useCallback } from "react";
+import { getOnus } from "../services/api";
+import { useOltData } from "../services/useOltData";
 import StatusBadge from "../components/StatusBadge";
 import "./TablePage.css";
 
@@ -7,7 +8,12 @@ function OnuStatus() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
 
-  const filtered = onus.filter((o) => {
+  const fetchFn = useCallback(getOnus, []);
+  const { data: onus, loading, error } = useOltData(fetchFn);
+
+  const allOnus = onus || [];
+
+  const filtered = allOnus.filter((o) => {
     const matchStatus = filter === "all" || o.status === filter;
     const matchSearch =
       !search ||
@@ -17,11 +23,18 @@ function OnuStatus() {
     return matchStatus && matchSearch;
   });
 
+  if (loading && !onus) {
+    return <div className="page-content"><div className="loading-state">Loading ONU status…</div></div>;
+  }
+
   return (
     <div className="page-content">
       <div className="page-header">
         <h1 className="page-title">ONU Status</h1>
-        <span className="page-meta">{onus.filter((o) => o.status === "online").length} / {onus.length} online</span>
+        <span className="page-meta">
+          {allOnus.filter((o) => o.status === "online").length} / {allOnus.length} online
+          {error && <span className="error-inline"> · ⚠ {error}</span>}
+        </span>
       </div>
       <div className="toolbar">
         <input

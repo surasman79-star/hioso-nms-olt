@@ -1,14 +1,24 @@
-import React from "react";
-import { gePorts } from "../data/mockData";
+import React, { useCallback } from "react";
+import { getGePorts } from "../services/api";
+import { useOltData } from "../services/useOltData";
 import StatusBadge from "../components/StatusBadge";
 import "./TablePage.css";
 
 function GePorts() {
+  const fetchFn = useCallback(getGePorts, []);
+  const { data: gePorts, loading, error } = useOltData(fetchFn);
+
+  if (loading && !gePorts) {
+    return <div className="page-content"><div className="loading-state">Loading GE ports…</div></div>;
+  }
+
+  const ports = gePorts || [];
+
   return (
     <div className="page-content">
       <div className="page-header">
         <h1 className="page-title">GE Ports</h1>
-        <span className="page-meta">{gePorts.length} ports</span>
+        <span className="page-meta">{ports.length} ports{error && <span className="error-inline"> · ⚠ {error}</span>}</span>
       </div>
       <div className="table-card">
         <table className="data-table">
@@ -24,7 +34,7 @@ function GePorts() {
             </tr>
           </thead>
           <tbody>
-            {gePorts.map((port) => (
+            {ports.map((port) => (
               <tr key={port.id}>
                 <td className="port-name">{port.name}</td>
                 <td><StatusBadge status={port.status} /></td>

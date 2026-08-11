@@ -1,16 +1,29 @@
-import React, { useState } from "react";
-import { onuConfigs } from "../data/mockData";
+import React, { useState, useCallback } from "react";
+import { getOnuConfigs } from "../services/api";
+import { useOltData } from "../services/useOltData";
 import "./TablePage.css";
 
 function OnuConfig() {
   const [selected, setSelected] = useState(null);
-  const cfg = onuConfigs.find((c) => c.id === selected);
+
+  const fetchFn = useCallback(getOnuConfigs, []);
+  const { data: onuConfigs, loading, error } = useOltData(fetchFn);
+
+  const configs = onuConfigs || [];
+  const cfg = configs.find((c) => c.id === selected);
+
+  if (loading && !onuConfigs) {
+    return <div className="page-content"><div className="loading-state">Loading ONU config…</div></div>;
+  }
 
   return (
     <div className="page-content">
       <div className="page-header">
         <h1 className="page-title">ONU Configuration</h1>
-        <span className="page-meta">Click a row to view details</span>
+        <span className="page-meta">
+          Click a row to view details
+          {error && <span className="error-inline"> · ⚠ {error}</span>}
+        </span>
       </div>
       <div className="config-layout">
         <div className="table-card config-table-wrap">
@@ -28,22 +41,22 @@ function OnuConfig() {
               </tr>
             </thead>
             <tbody>
-              {onuConfigs.map((cfg) => (
+              {configs.map((c) => (
                 <tr
-                  key={cfg.id}
-                  className={`clickable-row${selected === cfg.id ? " selected-row" : ""}`}
-                  onClick={() => setSelected(cfg.id === selected ? null : cfg.id)}
+                  key={c.id}
+                  className={`clickable-row${selected === c.id ? " selected-row" : ""}`}
+                  onClick={() => setSelected(c.id === selected ? null : c.id)}
                 >
-                  <td className="port-name">{cfg.id}</td>
-                  <td>{cfg.ponPort}</td>
-                  <td><code>{cfg.serialNumber}</code></td>
-                  <td>{cfg.type}</td>
-                  <td>{cfg.vlan}</td>
-                  <td>{cfg.profile}</td>
-                  <td>{cfg.bandwidthProfile}</td>
+                  <td className="port-name">{c.id}</td>
+                  <td>{c.ponPort}</td>
+                  <td><code>{c.serialNumber}</code></td>
+                  <td>{c.type}</td>
+                  <td>{c.vlan}</td>
+                  <td>{c.profile}</td>
+                  <td>{c.bandwidthProfile}</td>
                   <td>
-                    <span className={`admin-badge admin-${cfg.adminStatus}`}>
-                      {cfg.adminStatus}
+                    <span className={`admin-badge admin-${c.adminStatus}`}>
+                      {c.adminStatus}
                     </span>
                   </td>
                 </tr>

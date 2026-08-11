@@ -19,7 +19,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron:dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
+    "server": "node server/index.js",
+    "electron:dev": "concurrently \"node server/index.js\" \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "electron:build": "npm run build && electron-builder",
     "electron:build:win": "npm run build && electron-builder --win",
     "electron:build:mac": "npm run build && electron-builder --mac",
@@ -72,6 +73,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "serverDependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "net-snmp": "^3.12.1",
+    "node-ssh": "^13.2.1"
   },
   "devDependencies": {
     "concurrently": "^10.0.4",

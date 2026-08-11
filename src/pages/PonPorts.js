@@ -1,14 +1,24 @@
-import React from "react";
-import { ponPorts } from "../data/mockData";
+import React, { useCallback } from "react";
+import { getPonPorts } from "../services/api";
+import { useOltData } from "../services/useOltData";
 import StatusBadge from "../components/StatusBadge";
 import "./TablePage.css";
 
 function PonPorts() {
+  const fetchFn = useCallback(getPonPorts, []);
+  const { data: ponPorts, loading, error } = useOltData(fetchFn);
+
+  if (loading && !ponPorts) {
+    return <div className="page-content"><div className="loading-state">Loading PON ports…</div></div>;
+  }
+
+  const ports = ponPorts || [];
+
   return (
     <div className="page-content">
       <div className="page-header">
         <h1 className="page-title">PON Ports</h1>
-        <span className="page-meta">{ponPorts.length} ports</span>
+        <span className="page-meta">{ports.length} ports{error && <span className="error-inline"> · ⚠ {error}</span>}</span>
       </div>
       <div className="table-card">
         <table className="data-table">
@@ -24,7 +34,7 @@ function PonPorts() {
             </tr>
           </thead>
           <tbody>
-            {ponPorts.map((port) => (
+            {ports.map((port) => (
               <tr key={port.id}>
                 <td className="port-name">{port.name}</td>
                 <td><StatusBadge status={port.status} /></td>
